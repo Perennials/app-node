@@ -236,7 +236,7 @@ Config.define( {
 	renderRel: function ( text, args, ctx ) {
 		
 		if ( text instanceof Function ) {
-			return text.apply( null, args );
+			return text.apply( this, args );
 		}
 		
 		if ( String.isString( text ) && text.indexOf( '{' ) >= 0 ) {
