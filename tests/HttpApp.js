@@ -40,7 +40,6 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 			}, 50 );	
 		}
 	};
-	process.on( 'unhandledException', function (e ) { console.log(e)} );
 	app1.onError = function ( err, ctx ) {
 		++nerr;
 		ctx.res.end();
