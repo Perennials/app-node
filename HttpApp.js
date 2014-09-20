@@ -1,7 +1,7 @@
 "use strict";
 
 var App = require( './App.js' );
-var Domain = require( 'domain' );
+var RequestContext = require( './RequestContext.js' );
 var Http = require( 'http' );
 
 function HttpApp ( host, port ) {
@@ -30,48 +30,41 @@ HttpApp.extend( App, {
 		}
 	},
 
-	onError: function ( err ) {
+	onError: function ( err, req, res ) {
 		this.shutdown( 1 );
 	},
 
 	onHttpRequest: function ( req, res ) {
-		console.log(req,res)
 		var _this = this;
-		var domain = Domain.create();
-		domain.add( req );
-		domain._req = req;
-		domain.add( res );
-		domain._res = res;
+		var ctx = new RequestContext( req, res );
 
 		res.on( 'close', function () {
-			domain.dispose();
-			domain._req = null;
-			domain._res = null;
+			ctx.dispose();
 		} );
 	
-		domain.on( 'error', function () {
-			return _this.onError.apply( _this, arguments );
+		ctx.domain.on( 'error', function ( err ) {
+			return _this.onError( err, ctx );
 		} );
 		
-		domain.run( function () {
-			_this.onHttpHeaders( req, res );
+		ctx.domain.run( function () {
+			_this.onHttpHeaders( ctx );
 		} );
 	},
 
-	onHttpContent: function ( req, res ) {
+	onHttpContent: function ( ctx ) {
 		throw new Error( 'HttpApp.onHttpContent() not implemented.' );
 	},
 
-	onHttpHeaders: function ( req, res ) {
+	onHttpHeaders: function ( ctx ) {
 		var _this = this;
 		var chunks = [];
-		req.on( 'data', function( chunk ) {
+		ctx.req.on( 'data', function( chunk ) {
 			chunks.push( chunk );
 		} );
 
-		req.on( 'end', function () {
-			req.content = Buffer.concat( chunks );
-			_this.onHttpContent( req, res );
+		ctx.req.on( 'end', function () {
+			ctx.req.content = Buffer.concat( chunks );
+			_this.onHttpContent( ctx );
 		} );
 	}
 

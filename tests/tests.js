@@ -8,4 +8,5 @@ if ( process.argv[2] == 'nocolor' ) {
 
 require( './Argv.js' );
 require( './Config.js' );
+require( './HttpApp.js' );
 require( './App.js' );
