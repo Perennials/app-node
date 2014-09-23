@@ -30,7 +30,7 @@ HttpApp.extend( App, {
 		}
 	},
 
-	onError: function ( err, req, res ) {
+	onError: function ( err, ctx ) {
 		this.shutdown( 1 );
 	},
 

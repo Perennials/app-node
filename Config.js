@@ -205,6 +205,9 @@ Config.define( {
 		}
 		else {
 			obj = this[ id ];
+			if ( obj !== undefined ) {
+				ctx.push( obj );
+			}
 		}
 
 		return this.renderRel( obj, args, ctx.slice( 0, -1 ) );
@@ -253,7 +256,7 @@ Config.define( {
 				// no number or invalid number, it must be a property ref then
 				else {
 					if ( id.startsWith( '_.' ) || id.startsWith( '__.' ) ) {
-						value = _this.getRel( id, null, ctx );
+						value = _this.getRel( id, null, ctx.duplicate() );
 					}
 					else {
 						value = _this.get( id );

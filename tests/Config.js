@@ -1,5 +1,28 @@
 var Config = require( '../Config.js' );
 
+Unitest.only( true, 'Readme.sample' );
+
+Unitest( 'Readme.sample', function ( test ) {
+	var cfg = new Config( {
+		shared: {
+			separator: ', '
+		},
+
+		// we have absolute reference {name.full} and dynamic value {1}
+		my_name: 'my name is {name.full}; i am {1} years old.',
+		
+		name: {
+			first: 'tosho',
+			last: 'afrikanski',
+			
+			// this is relative reference from the current node (_) or from the parent node (__)
+			full: '{_.last}{__.shared.separator}{_.first}'
+		}
+	} );
+
+	test( cfg.get( 'my_name', 30 ) == 'my name is afrikanski, tosho; i am 30 years old.' );
+} );
+
 Unitest( 'Config.sample 1', function ( test ) {
 	var ENG = new Config( { hello: 'hello', bye: 'bye' } );
 	var DEU = new Config( { hello: 'hallo', bye: 'auf wiedersehen' }, ENG );
