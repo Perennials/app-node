@@ -18,6 +18,10 @@ function App () {
 
 App.define( {
 
+	getArgv: function () {
+		return this._argv;
+	},
+
 	cleanup: function ( ready ) {
 		ready();
 	},
