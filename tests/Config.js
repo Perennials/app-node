@@ -1,6 +1,6 @@
 var Config = require( '../Config.js' );
 
-Unitest.only( true, 'Readme.sample' );
+// Unitest.only( true, 'Config.relative' );
 
 Unitest( 'Readme.sample', function ( test ) {
 	var cfg = new Config( {

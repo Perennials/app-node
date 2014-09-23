@@ -256,7 +256,7 @@ Config.define( {
 				// no number or invalid number, it must be a property ref then
 				else {
 					if ( id.startsWith( '_.' ) || id.startsWith( '__.' ) ) {
-						value = _this.getRel( id, null, ctx.duplicate() );
+						value = _this.getRel( id, null, [].concat( ctx ) );
 					}
 					else {
 						value = _this.get( id );
