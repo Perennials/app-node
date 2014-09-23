@@ -274,7 +274,7 @@ var clr = require( 'App/CliColors' );
 
 console.log( clr.blue, clr.greenbg, 'blue on green background',
              clr.def, 'default on green background',
-             clr.rest, 'default' );
+             clr.reset, 'default' );
 ```
 
 Authors
