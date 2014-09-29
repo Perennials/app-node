@@ -138,7 +138,7 @@ callback, as well as the domain associated with the request.
 
 ```js
 {
-	req: http.ClientRequest,
+	req: http.IncommingMessage,
 	res: http.ServerResponse,
 	domain: Domain
 }
