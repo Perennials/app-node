@@ -16,6 +16,8 @@ npm install https://github.com/Perennials/app-node/tarball/master
 	- [Methods](#methods-1)
 - [Config](#config)
 	- [Example usage](#example-usage-1)
+		- [Stacking](#stacking)
+		- [References](#references)
 - [Argv](#argv)
 	- [Example usage](#example-usage-2)
 - [CliColors](#clicolors)
@@ -100,21 +102,21 @@ Closes the HTTP server (http.Server.close).
 
 
 ```js
-.onHttpContent( ctx:RequestContext );
+.onHttpContent( rqctx:RequestContext );
 ```
 Called whenever there is HTTP request and the whole request content is received.
 **Must be overriden**.
 
 
 ```js
-.onError( ctx:RequestContnext );
+.onError( rqctx:RequestContnext );
 ```
 Called whenever uncaught exception happens in the context of an HTTP request.
 **Recommended to override**.
 
 
 ```js
-.onHttpHeaders( ctx:RequestContext );
+.onHttpHeaders( rqctx:RequestContext );
 ```
 Called whenever there is HTTP request. The default implementation installs
 'data' handler, reads the content and calls `.onHttpContent()`. Can be overriden
@@ -138,6 +140,7 @@ callback, as well as the domain associated with the request.
 
 ```js
 {
+	app: HttpApp,
 	req: http.IncommingMessage,
 	res: http.ServerResponse,
 	domain: Domain

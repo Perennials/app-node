@@ -2,7 +2,8 @@
 
 var Domain = require( 'domain' );
 
-function RequestContext ( req, res ) {
+function RequestContext ( app, req, res ) {
+	this.app = app;
 	this.req = req;
 	this.res = res;
 	this.domain = Domain.create();

@@ -30,41 +30,41 @@ HttpApp.extend( App, {
 		}
 	},
 
-	onError: function ( err, ctx ) {
+	onError: function ( err, rqctx ) {
 		this.shutdown( 1 );
 	},
 
 	onHttpRequest: function ( req, res ) {
 		var _this = this;
-		var ctx = new RequestContext( req, res );
+		var rqctx = new RequestContext( this, req, res );
 
 		res.on( 'close', function () {
-			ctx.dispose();
+			rqctx.dispose();
 		} );
 	
-		ctx.domain.on( 'error', function ( err ) {
-			return _this.onError( err, ctx );
+		rqctx.domain.on( 'error', function ( err ) {
+			return _this.onError( err, rqctx );
 		} );
 		
-		ctx.domain.run( function () {
-			_this.onHttpHeaders( ctx );
+		rqctx.domain.run( function () {
+			_this.onHttpHeaders( rqctx );
 		} );
 	},
 
-	onHttpContent: function ( ctx ) {
+	onHttpContent: function ( rqctx ) {
 		throw new Error( 'HttpApp.onHttpContent() not implemented.' );
 	},
 
-	onHttpHeaders: function ( ctx ) {
+	onHttpHeaders: function ( rqctx ) {
 		var _this = this;
 		var chunks = [];
-		ctx.req.on( 'data', function( chunk ) {
+		rqctx.req.on( 'data', function( chunk ) {
 			chunks.push( chunk );
 		} );
 
-		ctx.req.on( 'end', function () {
-			ctx.req.content = Buffer.concat( chunks );
-			_this.onHttpContent( ctx );
+		rqctx.req.on( 'end', function () {
+			rqctx.req.content = Buffer.concat( chunks );
+			_this.onHttpContent( rqctx );
 		} );
 	}
 
