@@ -22,12 +22,7 @@ HttpApp.extend( App, {
 	},
 
 	cleanup: function ( ready ) {
-		try {
-			this._server.close( ready );
-		}
-		catch ( e ) {
-			ready();
-		}
+		this._server.close( ready );
 	},
 
 	onError: function ( err, rqctx ) {
