@@ -164,8 +164,8 @@ in case access to the HTTP headers is needed before handling the content.
 
 #### .onHttpRequest()
 Default HTTP request handler called directly from node's http.Server. The
-default implementation does the domain handling. Can be overriden for advanced
-use.
+default implementation does the domain handling and calls `.onHttpHeaders()`.
+Can be overriden for advanced use.
 
 ```js
 .onHttpRequest( req, res );
