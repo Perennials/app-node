@@ -11,9 +11,19 @@ npm install https://github.com/Perennials/app-node/tarball/master
 - [HttpApp](#httpapp)
 	- [Example usage](#example-usage)
 	- [Methods](#methods)
+		- [Constructor](#constructor)
+		- [.startListening()](#startlistening)
+		- [.cleanup()](#cleanup)
+		- [.onHttpContent()](#onhttpcontent)
+		- [.onError()](#onerror)
+		- [.onHttpHeaders()](#onhttpheaders)
+		- [.onHttpRequest()](#onhttprequest)
 - [RequestContext](#requestcontext)
 - [App](#app)
 	- [Methods](#methods-1)
+		- [.getArgv()](#getargv)
+		- [.cleanup()](#cleanup-1)
+		- [.shutdown()](#shutdown)
 - [Config](#config)
 	- [Example usage](#example-usage-1)
 		- [Stacking](#stacking)
@@ -84,51 +94,82 @@ app.startListening();
 
 ### Methods
 
-```js
-new HttpApp( host:String, port:Number );
-```
+- [Constructor](#constructor)
+- [.startListening()](#startlistening)
+- [.cleanup()](#cleanup)
+- [.onHttpContent()](#onhttpcontent)
+- [.onError()](#onerror)
+- [.onHttpHeaders()](#onhttpheaders)
+- [.onHttpRequest()](#onhttprequest)
+
+#### Constructor
 Constructor.
+
+```js
+new HttpApp(
+	host:String,
+	port:Number
+);
+```
+
+#### .startListening()
+Starts listening for HTTP requests.
 
 ```js
 .startListening();
 ```
-Starts listening for HTTP requests.
 
+
+#### .cleanup()
+Closes the HTTP server (http.Server.close).
 
 ```js
 .cleanup();
 ```
-Closes the HTTP server (http.Server.close).
 
 
-```js
-.onHttpContent( rqctx:RequestContext );
-```
+#### .onHttpContent()
 Called whenever there is HTTP request and the whole request content is received.
 **Must be overriden**.
 
-
 ```js
-.onError( rqctx:RequestContnext );
+.onHttpContent(
+	rqctx:RequestContext
+);
 ```
+
+
+#### .onError()
 Called whenever uncaught exception happens in the context of an HTTP request.
 **Recommended to override**.
 
-
 ```js
-.onHttpHeaders( rqctx:RequestContext );
+.onError(
+	rqctx:RequestContnext
+);
 ```
+
+
+#### .onHttpHeaders()
 Called whenever there is HTTP request. The default implementation installs
 'data' handler, reads the content and calls `.onHttpContent()`. Can be overriden
 in case access to the HTTP headers is needed before handling the content.
 
+```js
+.onHttpHeaders(
+	rqctx:RequestContext
+);
+```
+
+
+#### .onHttpRequest()
+Default HTTP request handler called directly from node's http.Server. The
+default implementation does the domain handling. Can be overriden for advanced
+use.
 
 ```js
 .onHttpRequest( req, res );
 ```
-Default HTTP request handler called directly from node's http.Server. The
-default implementation does the domain handling. Can be overriden for advanced
-use.
 
 
 
@@ -158,21 +199,36 @@ This class will install `.shutdown()` as signal handler for `SIGINT`, `SIGHUP`,
 
 ### Methods
 
-```js
-.getArgv() : Object|null;
-```
+- [.getArgv()](#getargv)
+- [.cleanup()](#cleanup-1)
+- [.shutdown()](#shutdown)
+
+#### .getArgv()
 Retrieves the `process.argv` parsed with `Argv.parse()`.
 
 ```js
-.cleanup( callback:function() );
+.getArgv() : Object|null;
 ```
+
+
+#### .cleanup()
 Performs application specific cleanup (as preparation graceful shutdown). The
 default function does nothing but call the callback.
 
 ```js
-.shutdown( code:Number );
+.cleanup(
+	callback:function()
+);
 ```
+
+#### .shutdown()
 Performs `.cleanup()` and then calls `process.exit( code )`.
+
+```js
+.shutdown(
+	code:Number
+);
+```
 
 
 Config
@@ -226,6 +282,8 @@ var cfg = new Config( {
 		last: 'afrikanski',
 		
 		// this is relative reference from the current node (_) or from the parent node (__)
+		// _ and __ are equivalent to . and .. when dealing with the file system in the shell
+		// they can be chained, of course, like __.__.and.so.on
 		full: '{_.last}{__.shared.separator}{_.first}'
 	}
 } );
