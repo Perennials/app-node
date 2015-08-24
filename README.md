@@ -13,7 +13,7 @@ npm install https://github.com/Perennials/app-node/tarball/master
 	- [Methods](#methods)
 		- [Constructor](#constructor)
 		- [.startListening()](#startlistening)
-		- [.cleanup()](#cleanup)
+		- [.onClose()](#onclose)
 		- [.onHttpContent()](#onhttpcontent)
 		- [.onError()](#onerror)
 		- [.onHttpHeaders()](#onhttpheaders)
@@ -22,8 +22,8 @@ npm install https://github.com/Perennials/app-node/tarball/master
 - [App](#app)
 	- [Methods](#methods-1)
 		- [.getArgv()](#getargv)
-		- [.cleanup()](#cleanup-1)
-		- [.shutdown()](#shutdown)
+		- [.onClose()](#onclose-1)
+		- [.close()](#close)
 - [Config](#config)
 	- [Example usage](#example-usage-1)
 		- [Stacking](#stacking)
@@ -96,7 +96,7 @@ app.startListening();
 
 - [Constructor](#constructor)
 - [.startListening()](#startlistening)
-- [.cleanup()](#cleanup)
+- [.onClose()](#onClose)
 - [.onHttpContent()](#onhttpcontent)
 - [.onError()](#onerror)
 - [.onHttpHeaders()](#onhttpheaders)
@@ -120,11 +120,11 @@ Starts listening for HTTP requests.
 ```
 
 
-#### .cleanup()
+#### .onClose()
 Closes the HTTP server (http.Server.close).
 
 ```js
-.cleanup();
+.onClose();
 ```
 
 
@@ -194,14 +194,14 @@ App
 
 Base application class for `HttpApp`. Not to be used directly.
 
-This class will install `.shutdown()` as signal handler for `SIGINT`, `SIGHUP`,
+This class will install `.close()` as signal handler for `SIGINT`, `SIGHUP`,
 `SIGTERM`, so it will try to close gracefully in all cases.
 
 ### Methods
 
 - [.getArgv()](#getargv)
-- [.cleanup()](#cleanup-1)
-- [.shutdown()](#shutdown)
+- [.onClose()](#onClose-1)
+- [.close()](#close)
 
 #### .getArgv()
 Retrieves the `process.argv` parsed with `Argv.parse()`.
@@ -211,21 +211,21 @@ Retrieves the `process.argv` parsed with `Argv.parse()`.
 ```
 
 
-#### .cleanup()
-Performs application specific cleanup (as preparation graceful shutdown). The
+#### .onClose()
+Performs application specific onClose (as preparation graceful close). The
 default function does nothing but call the callback.
 
 ```js
-.cleanup(
+.onClose(
 	callback:function()
 );
 ```
 
-#### .shutdown()
-Performs `.cleanup()` and then calls `process.exit( code )`.
+#### .close()
+Performs `.onClose()` and then calls `process.exit( code )`.
 
 ```js
-.shutdown(
+.close(
 	code:Number
 );
 ```

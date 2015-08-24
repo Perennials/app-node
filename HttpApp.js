@@ -21,12 +21,12 @@ HttpApp.extend( App, {
 		this._server.listen( this._port, this._host );
 	},
 
-	cleanup: function ( ready ) {
+	onClose: function ( ready ) {
 		this._server.close( ready );
 	},
 
 	onError: function ( err, rqctx ) {
-		this.shutdown( 1 );
+		this.close( 1 );
 	},
 
 	onHttpRequest: function ( req, res ) {

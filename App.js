@@ -7,13 +7,13 @@ function App () {
 	this.argv = Argv.parse();
 	
 	var _this = this;
-	var shutdown = function () {
-		return _this.shutdown.apply( _this, arguments );
+	var close = function () {
+		return _this.close.apply( _this, arguments );
 	};
 
-	process.on( 'SIGINT', shutdown );
-	process.on( 'SIGHUP', shutdown );
-	process.on( 'SIGTERM', shutdown );
+	process.on( 'SIGINT', close );
+	process.on( 'SIGHUP', close );
+	process.on( 'SIGTERM', close );
 }
 
 App.define( {
@@ -22,13 +22,15 @@ App.define( {
 		return this._argv;
 	},
 
-	cleanup: function ( ready ) {
-		ready();
+	onClose: function ( callback ) {
+		if ( callback instanceof Function ) {
+			callback();
+		}
 	},
 
-	shutdown: function ( code ) {
+	close: function ( code ) {
 
-		this.cleanup( function () {
+		this.onClose( function () {
 			process.exit( code );
 		} );
 

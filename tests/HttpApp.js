@@ -8,7 +8,7 @@ UnitestA( 'HttpApp.onHttpContent', function ( test ) {
 		test( ctx.req.headers.someting === 'custom' );
 		test( ctx.req.content.toString() === 'asd.qwe' );
 		ctx.res.end();
-		this.cleanup( function () {
+		this.onClose( function () {
 			test.out();
 		} );
 	};
@@ -49,7 +49,7 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 		if ( nerr === 1 ) {
 			test( err.message === '3' );
 			test( ctx.req.content.toString() === '333' );
-			this.cleanup( function () {
+			this.onClose( function () {
 				test.out();
 			} );
 		}
