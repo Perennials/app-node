@@ -1,3 +1,9 @@
+1.2
+===
+
+- Big refactoring of `HttpApp`. Request are not handled in the App class
+  anymore but have their own `HttpAppRequest` instance.
+
 1.1
 ===
 

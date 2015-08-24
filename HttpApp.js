@@ -1,66 +1,52 @@
 "use strict";
 
-var App = require( './App.js' );
-var RequestContext = require( './RequestContext.js' );
+var App = require( './App' );
+var HttpAppRequest = require( './HttpAppRequest' );
 var Http = require( 'http' );
 
-function HttpApp ( host, port ) {
+function HttpApp ( appRequestClass, host, port ) {
 	var _this = this;
 	App.call( this );
+	this._appRequestClass = appRequestClass;
 	this._host = host;
 	this._port = port;
 	this._server = Http.createServer();
 	this._server.on( 'request', function ( req, res ) {
 		return _this.onHttpRequest( req, res );
 	} );
+	this._requests = [];
 }
 
 HttpApp.extend( App, {
+
+	// keeps track of the running requests in this http server
+	registerRequest: function ( request ) {
+		if ( !(request instanceof HttpAppRequest) ) {
+			throw new TypeError( 'Not an HttpAppRequest.' );
+		}
+		this._requests.push( request );
+	},
+
+	unregisterRequest: function ( request ) {
+		for ( var i = this._requests.length - 1; i >= 0; --i ) {
+			if ( this._requests[ i ] === request ) {
+				this._requests.splice( i, 1 );
+				return true;
+			}
+		}
+		return false;
+	},
 
 	startListening: function () {
 		this._server.listen( this._port, this._host );
 	},
 
-	onClose: function ( ready ) {
-		this._server.close( ready );
-	},
-
-	onError: function ( err, rqctx ) {
-		this.close( 1 );
+	onClose: function ( callback ) {
+		this._server.close( callback );
 	},
 
 	onHttpRequest: function ( req, res ) {
-		var _this = this;
-		var rqctx = new RequestContext( this, req, res );
-
-		res.on( 'close', function () {
-			rqctx.dispose();
-		} );
-	
-		rqctx.domain.on( 'error', function ( err ) {
-			return _this.onError( err, rqctx );
-		} );
-		
-		rqctx.domain.run( function () {
-			_this.onHttpHeaders( rqctx );
-		} );
-	},
-
-	onHttpContent: function ( rqctx ) {
-		throw new Error( 'HttpApp.onHttpContent() not implemented.' );
-	},
-
-	onHttpHeaders: function ( rqctx ) {
-		var _this = this;
-		var chunks = [];
-		rqctx.req.on( 'data', function( chunk ) {
-			chunks.push( chunk );
-		} );
-
-		rqctx.req.on( 'end', function () {
-			rqctx.req.content = Buffer.concat( chunks );
-			_this.onHttpContent( rqctx );
-		} );
+		this.registerRequest( new this._appRequestClass( this, req, res ) );
 	}
 
 } );

@@ -14,13 +14,15 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [Constructor](#constructor)
 		- [.startListening()](#startlistening)
 		- [.onClose()](#onclose)
+		- [.onHttpRequest()](#onhttprequest)
+- [HttpAppRequest](#httpapprequest)
+	- [Methods](#methods-1)
+		- [Constructor](#constructor-1)
+		- [.onHttpHeaders()](#onhttpheaders)
 		- [.onHttpContent()](#onhttpcontent)
 		- [.onError()](#onerror)
-		- [.onHttpHeaders()](#onhttpheaders)
-		- [.onHttpRequest()](#onhttprequest)
-- [RequestContext](#requestcontext)
 - [App](#app)
-	- [Methods](#methods-1)
+	- [Methods](#methods-2)
 		- [.getArgv()](#getargv)
 		- [.onClose()](#onclose-1)
 		- [.close()](#close)
@@ -49,45 +51,53 @@ with node domains, so errors are associated with the proper HTTP request.
 
 ```js
 var HttpApp = require( 'App/HttpApp' );
+var HttpAppRequest = require( 'App/HttpAppRequest' );
 
-function MyHttpApp () {
-	HttpApp.call( this, '0.0.0.0', 80 );
+// this will be instantiated by HttpApp whenever we have a new request coming in
+function MyAppRequest ( app, req, res ) {
+	// call the parent constructor
+	HttpAppRequest.call( this, app, req, res );
 }
 
-MyHttpApp.extend( HttpApp, {
+MyAppRequest.extend( HttpAppRequest, {
+	
+	onError: function ( err ) {
 
-	onError: function ( ctx ) {
-
-		console.log( 'Damn, error happened with the client request', ctx.req );
+		console.log( 'Damn, error happened with this specific client request', this.Request );
 
 		// finish the response so we can close the server
-		ctx.res.writeHead( 500 );
-		ctx.res.end();
+		this.Response.writeHead( 500 );
+		this.Response.end();
+
+		// call the default handler, which will abort the app
+		HttpAppRequest.prototype.onError.call( this, err );
 	},
 
 
 	// this will be called when we have the whole http request
-	onHttpContent: function ( ctx ) {
+	onHttpContent: function ( content ) {
 
-		if ( ctx.req.headers[ 'content-encoding' ] === 'identity' ) {
-			console.log( 'The request content is', ctx.req.content.toString( 'utf8' ) );
+		// we have the full request at this point, headers and content
+		if ( this.Request.headers[ 'content-encoding' ] === 'identity' ) {
+			console.log( 'The request content is', content.toString( 'utf8' ) );
 		}
 
-		doSomethingWithThe( ctx.req, function ( good ) {
+		doSomethingWithThe( this.Request, function ( good ) {
 
-			ctx.res.writeHead( good ? 200 : 500, {
+			// normal nodejs handling of the response
+			this.Response.writeHead( good ? 200 : 500, {
 				'Connection': 'close',
 				'Content-Type': 'text/plain'
 			} );
-			ctx.res.end( 'bye' );
+			this.Response.end( 'bye' );
 
 		} );
 
 	}
-
 } );
 
-var app = new MyHttpApp();
+// construct a new HttpApp, tell it our request class is MyAppRequest
+var app = new HttpApp( MyAppRequest, '0.0.0.0', 80 );
 app.startListening();
 
 ```
@@ -97,16 +107,16 @@ app.startListening();
 - [Constructor](#constructor)
 - [.startListening()](#startlistening)
 - [.onClose()](#onClose)
-- [.onHttpContent()](#onhttpcontent)
-- [.onError()](#onerror)
-- [.onHttpHeaders()](#onhttpheaders)
 - [.onHttpRequest()](#onhttprequest)
 
 #### Constructor
-Constructor.
+Constructor. The `appRequestClass` argument is a constructor of a class
+derived of `HttpAppRequest`. It will be used `onHttpRequest()` to make
+a instance of this class for each incomming request.
 
 ```js
 new HttpApp(
+	appRequestClass:HttpAppRequest
 	host:String,
 	port:Number
 );
@@ -124,40 +134,8 @@ Starts listening for HTTP requests.
 Closes the HTTP server (http.Server.close).
 
 ```js
-.onClose();
-```
-
-
-#### .onHttpContent()
-Called whenever there is HTTP request and the whole request content is received.
-**Must be overriden**.
-
-```js
-.onHttpContent(
-	rqctx:RequestContext
-);
-```
-
-
-#### .onError()
-Called whenever uncaught exception happens in the context of an HTTP request.
-**Recommended to override**.
-
-```js
-.onError(
-	rqctx:RequestContnext
-);
-```
-
-
-#### .onHttpHeaders()
-Called whenever there is HTTP request. The default implementation installs
-'data' handler, reads the content and calls `.onHttpContent()`. Can be overriden
-in case access to the HTTP headers is needed before handling the content.
-
-```js
-.onHttpHeaders(
-	rqctx:RequestContext
+.onClose(
+	callback:function()
 );
 ```
 
@@ -173,19 +151,71 @@ Can be overriden for advanced use.
 
 
 
-RequestContext
+HttpAppRequest
 --------------
 
 This object encapsulates node's native types passed to the HTTP request
-callback, as well as the domain associated with the request.
+callback, as well as the domain associated with the request. It should be
+subclassed to override the desired functionality.
 
 ```js
 {
+	App: HttpApp,
+	Request: http.IncommingMessage,
+	Response: http.ServerResponse,
+	Domain: Domain
+}
+```
+
+### Methods
+
+- [Constructor](#constructor-1)
+- [.onHttpHeaders()](#onhttpheaders)
+- [.onHttpContent()](#onhttpcontent)
+- [.onError()](#onerror)
+
+#### Constructor
+Constructor. It receives reference to the `HttpApp` and nodejs' request and
+response objects from the request handler of the HTTP server.
+
+```js
+new HttpAppRequest(
 	app: HttpApp,
 	req: http.IncommingMessage,
 	res: http.ServerResponse,
-	domain: Domain
-}
+);
+```
+
+
+#### .onHttpHeaders()
+Called whenever there is HTTP request. The default implementation installs
+'data' handler, reads the content and calls `.onHttpContent()`. Can be overriden
+in case access to the HTTP headers is needed before handling the content.
+
+```js
+.onHttpHeaders();
+```
+
+
+#### .onHttpContent()
+Called whenever there is HTTP request and the whole request content is received.
+**Must be overriden**.
+
+```js
+.onHttpContent(
+	content:Buffer
+);
+```
+
+
+#### .onError()
+Called whenever uncaught exception happens in the context of an HTTP request.
+**Recommended to override**.
+
+```js
+.onError(
+	err:Error
+);
 ```
 
 
@@ -195,7 +225,8 @@ App
 Base application class for `HttpApp`. Not to be used directly.
 
 This class will install `.close()` as signal handler for `SIGINT`, `SIGHUP`,
-`SIGTERM`, so it will try to close gracefully in all cases.
+`SIGTERM`, so it will try to close gracefully in all cases by calling `.onClose()`,
+which is meant to do cleanup.
 
 ### Methods
 

@@ -1,17 +1,25 @@
-var HttpApp = require( '../HttpApp.js' );
+var HttpApp = require( '../HttpApp' );
+var HttpAppRequest = require( '../HttpAppRequest' );
 var HttpRequest = require( 'Net/HttpRequest' );
 
-UnitestA( 'HttpApp.onHttpContent', function ( test ) {
+UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 
-	var app1 = new HttpApp( '127.0.0.1', 55555 );
-	app1.onHttpContent = function ( ctx ) {
-		test( ctx.req.headers.someting === 'custom' );
-		test( ctx.req.content.toString() === 'asd.qwe' );
-		ctx.res.end();
-		this.onClose( function () {
-			test.out();
-		} );
-	};
+	function TestAppRequest ( app, req, res ) {
+		HttpAppRequest.call( this, app, req, res );
+	}
+
+	TestAppRequest.extend( HttpAppRequest, {
+		onHttpContent: function ( content ) {
+			test( this.Request.headers.someting === 'custom' );
+			test( content.toString() === 'asd.qwe' );
+			this.Response.end();
+			this.App.onClose( function () {
+				test.out();
+			} );
+		}
+	} );
+
+	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
 	app1.startListening();
 	(new HttpRequest( 'http://127.0.0.1:55555' ))
 		.setHeader( 'someting', 'custom' )
@@ -24,44 +32,53 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 	var nreq = 0;
 	var nerr = 0;
 
-	var app1 = new HttpApp( '127.0.0.1', 55555 );
-	app1.onHttpContent = function ( ctx ) {
-		++nreq;
-		if ( nreq === 1 ) {
-			setTimeout( function () {
-				throw new Error( '1' );
-			}, 100 );
-		}
-		else if ( nreq === 2 ) {
-			setTimeout( function () {
-				process.nextTick( function () {
-					throw new Error( '2' );
+	function TestAppRequest ( app, req, res ) {
+		HttpAppRequest.call( this, app, req, res );
+	}
+
+	TestAppRequest.extend( HttpAppRequest, {
+		onHttpContent: function ( content ) {
+			this.Request.content = content;
+			++nreq;
+			if ( nreq === 1 ) {
+				setTimeout( function () {
+					throw new Error( '1' );
+				}, 100 );
+			}
+			else if ( nreq === 2 ) {
+				setTimeout( function () {
+					process.nextTick( function () {
+						throw new Error( '2' );
+					} );
+				}, 50 );	
+			}
+			else if ( nreq === 3 ) {
+				throw new Error( '3' );
+			}
+		},
+
+		onError: function ( err ) {
+			++nerr;
+			this.Response.end();
+			if ( nerr === 1 ) {
+				test( err.message === '3' );
+				test( this.Request.content.toString() === '333' );
+				this.App.onClose( function () {
+					test.out();
 				} );
-			}, 50 );	
+			}
+			else if ( nerr === 2 ) {
+				test( err.message === '2' );
+				test( this.Request.content.toString() === '222' );
+			}
+			else if ( nerr === 3 ) {
+				test( err.message === '1' );
+				test( this.Request.content.toString() === '111' );
+			}
 		}
-		else if ( nreq === 3 ) {
-			throw new Error( '3' );
-		}
-	};
-	app1.onError = function ( err, ctx ) {
-		++nerr;
-		ctx.res.end();
-		if ( nerr === 1 ) {
-			test( err.message === '3' );
-			test( ctx.req.content.toString() === '333' );
-			this.onClose( function () {
-				test.out();
-			} );
-		}
-		else if ( nerr === 2 ) {
-			test( err.message === '2' );
-			test( ctx.req.content.toString() === '222' );
-		}
-		else if ( nerr === 3 ) {
-			test( err.message === '1' );
-			test( ctx.req.content.toString() === '111' );
-		}
-	};
+	} );
+
+	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
 	app1.startListening();
 	(new HttpRequest( 'http://127.0.0.1:55555' )).send( '111' );
 	(new HttpRequest( 'http://127.0.0.1:55555' )).send( '222' );
