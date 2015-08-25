@@ -13,7 +13,7 @@ UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 			test( this.Request.headers.someting === 'custom' );
 			test( content.toString() === 'asd.qwe' );
 			this.Response.end();
-			this.App.onClose( function () {
+			this.App.close( function () {
 				test.out();
 			} );
 		}
@@ -63,7 +63,7 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 			if ( nerr === 1 ) {
 				test( err.message === '3' );
 				test( this.Request.content.toString() === '333' );
-				this.App.onClose( function () {
+				this.App.close( function () {
 					test.out();
 				} );
 			}

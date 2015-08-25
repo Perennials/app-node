@@ -1,3 +1,10 @@
+1.3
+=====
+
+- `HttpApp.close()` will no longer exit the process, just the HTTP server.
+- `HttpApp.close()` now accepts a callback argument instead of exit code.
+
+
 1.2
 ===
 

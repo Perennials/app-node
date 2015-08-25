@@ -13,7 +13,7 @@ npm install https://github.com/Perennials/app-node/tarball/master
 	- [Methods](#methods)
 		- [Constructor](#constructor)
 		- [.startListening()](#startlistening)
-		- [.onClose()](#onclose)
+		- [.close()](#close)
 		- [.onHttpRequest()](#onhttprequest)
 - [HttpAppRequest](#httpapprequest)
 	- [Methods](#methods-1)
@@ -24,8 +24,8 @@ npm install https://github.com/Perennials/app-node/tarball/master
 - [App](#app)
 	- [Methods](#methods-2)
 		- [.getArgv()](#getargv)
-		- [.onClose()](#onclose-1)
-		- [.close()](#close)
+		- [.onClose()](#onclose)
+		- [.close()](#close-1)
 - [Config](#config)
 	- [Example usage](#example-usage-1)
 		- [Stacking](#stacking)
@@ -106,7 +106,7 @@ app.startListening();
 
 - [Constructor](#constructor)
 - [.startListening()](#startlistening)
-- [.onClose()](#onClose)
+- [.close()](#close)
 - [.onHttpRequest()](#onhttprequest)
 
 #### Constructor
@@ -130,11 +130,12 @@ Starts listening for HTTP requests.
 ```
 
 
-#### .onClose()
-Closes the HTTP server (http.Server.close).
+#### .close()
+Closes the HTTP server (http.Server.close). `.onClose()` will be called
+before the callback.
 
 ```js
-.onClose(
+.close(
 	callback:function()
 );
 ```
@@ -210,7 +211,8 @@ Called whenever there is HTTP request and the whole request content is received.
 
 #### .onError()
 Called whenever uncaught exception happens in the context of an HTTP request.
-**Recommended to override**.
+The default handler will print the error to stderr and call `.close()` on the
+`.App` objects. **Recommended to override**.
 
 ```js
 .onError(
@@ -232,7 +234,7 @@ which is meant to do cleanup.
 
 - [.getArgv()](#getargv)
 - [.onClose()](#onClose-1)
-- [.close()](#close)
+- [.close()](#close-1)
 
 #### .getArgv()
 Retrieves the `process.argv` parsed with `Argv.parse()`.
@@ -243,7 +245,7 @@ Retrieves the `process.argv` parsed with `Argv.parse()`.
 
 
 #### .onClose()
-Performs application specific onClose (as preparation graceful close). The
+Performs application specific onClose (as preparation for graceful exit). The
 default function does nothing but call the callback.
 
 ```js

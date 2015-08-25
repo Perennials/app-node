@@ -41,8 +41,12 @@ HttpApp.extend( App, {
 		this._server.listen( this._port, this._host );
 	},
 
-	onClose: function ( callback ) {
-		this._server.close( callback );
+	close: function ( callback ) {
+
+		var _this = this;
+		this._server.close( function () {
+			_this.onClose( callback );
+		} );
 	},
 
 	onHttpRequest: function ( req, res ) {

@@ -24,11 +24,11 @@ App.define( {
 
 	onClose: function ( callback ) {
 		if ( callback instanceof Function ) {
-			callback();
+			process.nextTick( callback );
 		}
 	},
 
-	close: function ( code ) {
+	close: function ( callback ) {
 
 		this.onClose( function () {
 			process.exit( code );
