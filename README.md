@@ -16,6 +16,7 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [.close()](#close)
 		- [.onHttpRequest()](#onhttprequest)
 - [HttpAppRequest](#httpapprequest)
+	- [Public properties](#public-properties)
 	- [Methods](#methods-1)
 		- [Constructor](#constructor-1)
 		- [.onHttpHeaders()](#onhttpheaders)
@@ -172,6 +173,11 @@ subclassed to override the desired functionality.
 ```js
 var HttpAppRequest = require( 'App/HttpAppRequest' );
 ```
+
+- [Public properties](#public-properties)
+- [Methods](#methods-1)
+
+### Public properties
 
 ```js
 {
