@@ -53,6 +53,10 @@ handler and upon receiving a request will instantiate the user's
 `HttpAppRequest` class. This way all logic associated with the request can be
 placed in the proper context.
 
+```js
+var HttpApp = require( 'App/HttpApp' );
+```
+
 ### Example usage
 
 ```js
@@ -166,6 +170,10 @@ callback, as well as the domain associated with the request. It should be
 subclassed to override the desired functionality.
 
 ```js
+var HttpAppRequest = require( 'App/HttpAppRequest' );
+```
+
+```js
 {
 	App: HttpApp,
 	Request: http.IncommingMessage,
@@ -241,6 +249,10 @@ This class will install `.close()` as signal handler for `SIGINT`, `SIGHUP`,
 `SIGTERM`, so it will try to close gracefully in all cases by calling `.onClose()`,
 which is meant to do cleanup.
 
+```js
+var App = require( 'App/App' );
+```
+
 ### Methods
 
 - [.getArgv()](#getargv)
@@ -281,7 +293,11 @@ Config
 The Config class provides stack-able object of properties, where the
 properties in the objects of the upper layers can override the lower layers.
 
-Properties can refer to other properties and have dynamic value.
+Properties can refer to other properties and have a dynamic (callback) value.
+
+```js
+var Config = require( 'App/Config' );
+```
 
 ### Example usage
 
@@ -343,6 +359,10 @@ Argv
 
 Helps with parsing application command line.
 
+```js
+var Argv = require( 'App/Argv' );
+```
+
 ### Example usage
 
 ```js
@@ -371,6 +391,9 @@ Additionally:
 * `defbg`, `resetbg` - default background.
 * `reset` - reset all styles.
 
+```js
+var clr = require( 'App/CliColors' );
+```
 
 ### Example usage
 
