@@ -122,7 +122,7 @@ a new instance of this class for each incomming request.
 
 ```js
 new HttpApp(
-	appRequestClass:HttpAppRequest
+	appRequestClass:Function
 	host:String,
 	port:Number
 );
