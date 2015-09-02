@@ -147,7 +147,7 @@ before the callback.
 
 ```js
 .close(
-	callback:function()
+	callback:function()|undefined
 );
 ```
 
@@ -279,7 +279,7 @@ default function does nothing but call the callback.
 
 ```js
 .onClose(
-	callback:function()
+	callback:function()|undefined
 );
 ```
 
