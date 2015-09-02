@@ -2,6 +2,11 @@
 
 var Domain = require( 'domain' );
 
+var Snappy = null;
+try { Snappy = require( 'snappy' ); }
+catch ( e ) {}
+var Zlib = require( 'zlib' );
+
 function HttpAppRequest ( app, req, res ) {
 	this.App = app;
 	this.Request = req;
@@ -45,7 +50,27 @@ HttpAppRequest.define( {
 		this.Request.on( 'end', function () {
 			var content = Buffer.concat( chunks );
 			chunks = null;
-			_this.onHttpContent( content );
+
+			var encoding = _this.Request.headers[ 'content-encondig' ];
+		
+			if ( encoding === 'gzip'  ) {
+				Zlib.gunzip( content, function ( err, decompressed ) {
+					_this.onHttpContent( err ? content : decompressed );
+				} );
+			}
+			else if ( encoding === 'deflate'  ) {
+				Zlib.inflate( content, function ( err, decompressed ) {
+					_this.onHttpContent( err ? content : decompressed );
+				} );
+			}
+			else if ( encoding === 'snappy' && Snappy ) {
+				Snappy.decompress( content, function ( err, decompressed ) {
+					_this.onHttpContent( err ? content : decompressed );
+				} );
+			}
+			else {
+				_this.onHttpContent( content );
+			}
 		} );
 	},
 
