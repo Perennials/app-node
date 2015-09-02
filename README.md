@@ -47,6 +47,12 @@ Provides a base for building HTTP server applications. The default
 implementation takes care of reading the whole request and handling errors
 with node domains, so errors are associated with the proper HTTP request.
 
+To reuse this class one extends the [HttpAppRequest](#httpapprequest) class
+and provides the constructor to `HttpApp`. The latter will install a request
+handler and upon receiving a request will instantiate the user's
+`HttpAppRequest` class. This way all logic associated with the request can be
+placed in the proper context.
+
 ### Example usage
 
 ```js
@@ -111,8 +117,8 @@ app.startListening();
 
 #### Constructor
 Constructor. The `appRequestClass` argument is a constructor of a class
-derived of `HttpAppRequest`. It will be used `onHttpRequest()` to make
-a instance of this class for each incomming request.
+derived from `HttpAppRequest`. It will be used by `onHttpRequest()` to create
+a new instance of this class for each incomming request.
 
 ```js
 new HttpApp(
@@ -177,7 +183,10 @@ subclassed to override the desired functionality.
 
 #### Constructor
 Constructor. It receives reference to the `HttpApp` and nodejs' request and
-response objects from the request handler of the HTTP server.
+response objects from the request handler of the HTTP server. This method will
+create the node domain and associate it with the request and call
+[.onHttpHeaders()](#onhttpheaders). Normally this constructor should be called
+by the constructor of the derived classes.
 
 ```js
 new HttpAppRequest(
@@ -190,8 +199,10 @@ new HttpAppRequest(
 
 #### .onHttpHeaders()
 Called whenever there is HTTP request. The default implementation installs
-'data' handler, reads the content and calls `.onHttpContent()`. Can be overriden
-in case access to the HTTP headers is needed before handling the content.
+'data' handler, reads the content and calls `.onHttpContent()`. The default
+implementation will check the headers and decompress `gzip`, `deflate` or
+`snappy` content. Can be overriden in case access to the HTTP headers is
+needed before handling the content or for advanced use.
 
 ```js
 .onHttpHeaders();
