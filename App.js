@@ -4,7 +4,7 @@ require( 'Prototype' );
 var Argv = require( './Argv.js' );
 
 function App () {
-	this.argv = Argv.parse();
+	this._argv = Argv.parse();
 	
 	var _this = this;
 	var close = function () {
