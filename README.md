@@ -1,5 +1,5 @@
-App
-===
+App module
+==========
 Application classes for Node.js.
 
 ```sh
