@@ -3,32 +3,32 @@
 require( 'Prototype' );
 var Argv = require( './Argv.js' );
 
-function App () {
-	this._argv = Argv.parse();
-	
-	var _this = this;
-	var close = function () {
-		return _this.close.apply( _this, arguments );
-	};
+class App {
+	constructor () {
 
-	process.on( 'SIGINT', close );
-	process.on( 'SIGHUP', close );
-	process.on( 'SIGTERM', close );
-}
+		this._argv = Argv.parse();
+		
+		var _this = this;
+		var close = function () {
+			return _this.close.apply( _this, arguments );
+		};
 
-App.define( {
+		process.on( 'SIGINT', close );
+		process.on( 'SIGHUP', close );
+		process.on( 'SIGTERM', close );
+	}
 
-	getArgv: function () {
+	getArgv () {
 		return this._argv;
-	},
+	}
 
-	onClose: function ( callback ) {
+	onClose ( callback ) {
 		if ( callback instanceof Function ) {
 			process.nextTick( callback );
 		}
-	},
+	}
 
-	close: function ( callback ) {
+	close ( callback ) {
 
 		this.onClose( function () {
 			process.exit( code );
@@ -36,6 +36,6 @@ App.define( {
 
 	}
 
-} );
+}
 
 module.exports = App;

@@ -7,7 +7,6 @@ var clr = {
 	
 	def: '\x1B[39m',
 	defbg: '\x1B[49m',
-	resetbg: '\x1B[49m',
 	
 	black: '\x1B[30m',
 	blackbg: '\x1B[40m',

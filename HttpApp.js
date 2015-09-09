@@ -4,30 +4,29 @@ var App = require( './App' );
 var HttpAppRequest = require( './HttpAppRequest' );
 var Http = require( 'http' );
 
-function HttpApp ( appRequestClass, host, port ) {
-	var _this = this;
-	App.call( this );
-	this._appRequestClass = appRequestClass;
-	this._host = host;
-	this._port = port;
-	this._server = Http.createServer();
-	this._server.on( 'request', function ( req, res ) {
-		return _this.onHttpRequest( req, res );
-	} );
-	this._requests = [];
-}
+class HttpApp extends App {
 
-HttpApp.extend( App, {
+	constructor ( appRequestClass, host, port ) {
+
+		super();
+		
+		this._appRequestClass = appRequestClass;
+		this._host = host;
+		this._port = port;
+		this._server = Http.createServer();
+		this._server.on( 'request', this.onHttpRequest.bind( this ) );
+		this._requests = [];
+	}
 
 	// keeps track of the running requests in this http server
-	registerRequest: function ( request ) {
+	registerRequest ( request ) {
 		if ( !(request instanceof HttpAppRequest) ) {
 			throw new TypeError( 'Not an HttpAppRequest.' );
 		}
 		this._requests.push( request );
-	},
+	}
 
-	unregisterRequest: function ( request ) {
+	unregisterRequest ( request ) {
 		for ( var i = this._requests.length - 1; i >= 0; --i ) {
 			if ( this._requests[ i ] === request ) {
 				this._requests.splice( i, 1 );
@@ -35,24 +34,24 @@ HttpApp.extend( App, {
 			}
 		}
 		return false;
-	},
+	}
 
-	startListening: function () {
+	startListening () {
 		this._server.listen( this._port, this._host );
-	},
+	}
 
-	close: function ( callback ) {
+	close ( callback ) {
 
 		var _this = this;
 		this._server.close( function () {
 			_this.onClose( callback );
 		} );
-	},
+	}
 
-	onHttpRequest: function ( req, res ) {
+	onHttpRequest ( req, res ) {
 		this.registerRequest( new this._appRequestClass( this, req, res ) );
 	}
 
-} );
+}
 
 module.exports = HttpApp;

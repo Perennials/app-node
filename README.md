@@ -61,18 +61,20 @@ var HttpApp = require( 'App/HttpApp' );
 ### Example usage
 
 ```js
-var HttpApp = require( 'App/HttpApp' );
-var HttpAppRequest = require( 'App/HttpAppRequest' );
+"use strict";
+
+var HttpApp = require( '../HttpApp' );
+var HttpAppRequest = require( '../HttpAppRequest' );
 
 // this will be instantiated by HttpApp whenever we have a new request coming in
-function MyAppRequest ( app, req, res ) {
-	// call the parent constructor
-	HttpAppRequest.call( this, app, req, res );
-}
-
-MyAppRequest.extend( HttpAppRequest, {
+class MyAppRequest extends HttpAppRequest {
 	
-	onError: function ( err ) {
+	constructor ( app, req, res ) {
+		// call the parent constructor
+		super( app, req, res );
+	}
+	
+	onError ( err ) {
 
 		console.log( 'Damn, error happened with this specific client request', this.Request );
 
@@ -81,12 +83,12 @@ MyAppRequest.extend( HttpAppRequest, {
 		this.Response.end();
 
 		// call the default handler, which will abort the app
-		HttpAppRequest.prototype.onError.call( this, err );
-	},
+		super.onError( err );
+	}
 
 
 	// this will be called when we have the whole http request
-	onHttpContent: function ( content ) {
+	onHttpContent ( content ) {
 
 		// we have the full request at this point, headers and content
 		if ( this.Request.headers[ 'content-encoding' ] === 'identity' ) {
@@ -105,12 +107,11 @@ MyAppRequest.extend( HttpAppRequest, {
 		} );
 
 	}
-} );
+}
 
 // construct a new HttpApp, tell it our request class is MyAppRequest
-var app = new HttpApp( MyAppRequest, '0.0.0.0', 80 );
+var app = new HttpApp( MyAppRequest, '0.0.0.0', 1337 );
 app.startListening();
-
 ```
 
 ### Methods
@@ -394,7 +395,7 @@ Additionally:
 
 * `gray` is synonim for `intenseblack`.
 * `def` - default foreground.
-* `defbg`, `resetbg` - default background.
+* `defbg`, - default background.
 * `reset` - reset all styles.
 
 ```js

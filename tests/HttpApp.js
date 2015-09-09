@@ -1,15 +1,17 @@
+"use strict";
+
 var HttpApp = require( '../HttpApp' );
 var HttpAppRequest = require( '../HttpAppRequest' );
 var HttpRequest = require( 'Net/HttpRequest' );
 
 UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 
-	function TestAppRequest ( app, req, res ) {
-		HttpAppRequest.call( this, app, req, res );
-	}
+	class TestAppRequest extends HttpAppRequest {
+		constructor ( app, req, res ) {
+			super( app, req, res );
+		}
 
-	TestAppRequest.extend( HttpAppRequest, {
-		onHttpContent: function ( content ) {
+		onHttpContent ( content ) {
 			test( this.Request.headers.someting === 'custom' );
 			test( content.toString() === 'asd.qwe' );
 			this.Response.end();
@@ -17,7 +19,7 @@ UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 				test.out();
 			} );
 		}
-	} );
+	}
 
 	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
 	app1.startListening();
@@ -32,12 +34,12 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 	var nreq = 0;
 	var nerr = 0;
 
-	function TestAppRequest ( app, req, res ) {
-		HttpAppRequest.call( this, app, req, res );
-	}
+	class TestAppRequest extends HttpAppRequest {
+		constructor ( app, req, res ) {
+			super( app, req, res );
+		}
 
-	TestAppRequest.extend( HttpAppRequest, {
-		onHttpContent: function ( content ) {
+		onHttpContent ( content ) {
 			this.Request.content = content;
 			++nreq;
 			if ( nreq === 1 ) {
@@ -55,9 +57,9 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 			else if ( nreq === 3 ) {
 				throw new Error( '3' );
 			}
-		},
+		}
 
-		onError: function ( err ) {
+		onError ( err ) {
 			++nerr;
 			this.Response.end();
 			if ( nerr === 1 ) {
@@ -76,7 +78,7 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 				test( this.Request.content.toString() === '111' );
 			}
 		}
-	} );
+	}
 
 	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
 	app1.startListening();

@@ -58,81 +58,25 @@ Creates a new config instance.
 @param Object with collection of properties for the config.
 @param Parent config to inherit some properties from.
 */
-function Config ( configset, parent ) {
+class Config {
 	
-	var that = this;
-	var Config = function () {};
-	Config.prototype = parent || this;
-	var ret = new Config;
+	constructor ( configset, parent ) {
 
-	if ( parent ) {
-		ret.Parent = parent;
-	}
+		var that = this;
+		var Config = function () {};
+		Config.prototype = parent || this;
+		var ret = new Config;
 
-	if ( configset ) {
-		ret.merge( configset );
-	}
-
-	return ret;
-}
-
-var Array_slice = Array.prototype.slice;
-var _regexCache = {};
-var RE_MATCH1 = /[\?\.\+\[\]\(\)\{\}\$\^\\\|]/g;
-var RE_MATCH2 = /\*\*/g;
-var RE_MATCH3 = /\*(?!\?)/g;
-var RE_VARIABLE = /{([\s\S]+?)}/g;
-
-function _flatten ( obj, callback, param, prefix ) {
-	for ( var i in obj ) {
-		var val = obj[ i ];
-		if ( Object.isObject( val ) ) {
-			_flatten( val, callback, param, prefix ? prefix + i + '.' : i + '.' );
+		if ( parent ) {
+			ret.Parent = parent;
 		}
-		callback( param, prefix ? prefix + i : i, val, obj );
-	}
-	if ( prefix === undefined && obj.Parent ) {
-		param.config = obj.Parent;
-		_flatten( obj.Parent, callback, param );
-	}
-}
 
-function _match ( param, name, value, ctx ) {
-	var m = name.match( param.regex );
-	if ( m && param.ret[name] === undefined ) {
-		param.ret[name] = new Config.Match( param.config, name, value, m.slice( 0 ), ctx );
-	}
-}
+		if ( configset ) {
+			ret.merge( configset );
+		}
 
-function _filterGet ( val ) {
-	return !(val instanceof Object);
-}
-
-Config.defineStatic( {
-	/**
-	@def object Config.Match {
-		Config:Config,
-		Name:String,
-		Value:mixed,
-		Matches:string[],
-		Context:Object
+		return ret;
 	}
-	@param Reference to the config object containing this property.
-	@param Dot delimited string with the id of the property.
-	@param Value of the matching property.
-	@param Array of all submatching patterns.
-	@param Context object of this value.
-	*/
-	Match: function ( config, name, value, matches, ctx ) {
-		this.Config = config;
-		this.Name = name;
-		this.Value = value;
-		this.Matches = matches;
-		this.Context = ctx;
-	}
-} );
-
-Config.define( {
 
 	/**
 	The Config this instance is inheriting from.
@@ -151,7 +95,7 @@ Config.define( {
 	    values will be raw, not passed through {@see render()}.
 	*/
 
-	match: function ( pattern ) {
+	match ( pattern ) {
 		var regex = _regexCache[pattern];
 		if ( regex === undefined ) {
 			pattern = '^' + pattern
@@ -164,9 +108,9 @@ Config.define( {
 		var param = { regex: regex, ret: {}, config: this };
 		_flatten( this, _match, param );
 		return param.ret;
-	},
+	}
 
-	getRel: function ( id, args, ctx ) {
+	getRel ( id, args, ctx ) {
 		
 		// if we have a pattern
 		if ( id.indexOf( '*' ) >= 0 ) {
@@ -211,7 +155,7 @@ Config.define( {
 		}
 
 		return this.renderRel( obj, args, ctx.slice( 0, -1 ) );
-	},
+	}
 
 	/**
 	Retrieves a resource with a given id.
@@ -224,7 +168,7 @@ Config.define( {
 	    if nothing is found. All returned values will be passed through
 	    {@see render()}.
 	*/
-	get: function ( id ) {
+	get ( id ) {
 
 		var ret = this.getRel( id, Array_slice.call( arguments, 1 ), [ this ] );
 
@@ -234,9 +178,9 @@ Config.define( {
 
 		return ret;
 
-	},
+	}
 
-	renderRel: function ( text, args, ctx ) {
+	renderRel ( text, args, ctx ) {
 		
 		if ( text instanceof Function ) {
 			return text.apply( this, args );
@@ -274,7 +218,7 @@ Config.define( {
 		}
 		
 		return text;
-	},
+	}
 
 	/**
 	Converts config variable references in a text to their values.
@@ -285,10 +229,67 @@ Config.define( {
 
 	@def function String Config.render ( text:String )
 	*/
-	render: function ( text ) {
+	render ( text ) {
 		return this.renderRel( text, Array_slice.call( arguments, 1 ), [ this ] );
 	}
+}
 
+var Array_slice = Array.prototype.slice;
+var _regexCache = {};
+var RE_MATCH1 = /[\?\.\+\[\]\(\)\{\}\$\^\\\|]/g;
+var RE_MATCH2 = /\*\*/g;
+var RE_MATCH3 = /\*(?!\?)/g;
+var RE_VARIABLE = /{([\s\S]+?)}/g;
+
+function _flatten ( obj, callback, param, prefix ) {
+	for ( var i in obj ) {
+		var val = obj[ i ];
+		if ( Object.isObject( val ) ) {
+			_flatten( val, callback, param, prefix ? prefix + i + '.' : i + '.' );
+		}
+		callback( param, prefix ? prefix + i : i, val, obj );
+	}
+	if ( prefix === undefined && obj.Parent ) {
+		param.config = obj.Parent;
+		_flatten( obj.Parent, callback, param );
+	}
+}
+
+function _match ( param, name, value, ctx ) {
+	var m = name.match( param.regex );
+	if ( m && param.ret[name] === undefined ) {
+		param.ret[name] = new Config.Match( param.config, name, value, m.slice( 0 ), ctx );
+	}
+}
+
+function _filterGet ( val ) {
+	return !(val instanceof Object);
+}
+
+Config.static( {
+	/**
+	@def object Config.Match {
+		Config:Config,
+		Name:String,
+		Value:mixed,
+		Matches:string[],
+		Context:Object
+	}
+	@param Reference to the config object containing this property.
+	@param Dot delimited string with the id of the property.
+	@param Value of the matching property.
+	@param Array of all submatching patterns.
+	@param Context object of this value.
+	*/
+	Match: class { 
+		constructor ( config, name, value, matches, ctx ) {
+			this.Config = config;
+			this.Name = name;
+			this.Value = value;
+			this.Matches = matches;
+			this.Context = ctx;
+		}
+	}
 } );
 
 module.exports = Config;

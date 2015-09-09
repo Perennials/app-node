@@ -27,7 +27,7 @@ will become
 @return object|null null if the argument list is empty.
 */
 var Argv = {
-	parse: function ( args ) {
+	parse ( args ) {
 		if ( args === undefined ) {
 			args = process.argv.slice( 2 );
 		}
