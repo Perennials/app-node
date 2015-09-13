@@ -1,7 +1,7 @@
 {
 	"name": "App",
 	"description": "Application classes for Node.js",
-	"version": "1.5.0",
+	"version": "1.5.1",
 	"author": "Borislav Peev <borislav.asdf@gmail.com>",
 	"engine": [
 		"node >= 4.0.0"
@@ -9,12 +9,12 @@
 	"scripts": {
 		"test": "node ./tests/tests.js"
 	},
+	"dependencies": {
+		"Prototype": "https://github.com/perennials/prototype-js/tarball/1.4.0"
+	},
 	"devDependencies": {
 		"Unitest": "https://github.com/perennials/unitest-js/tarball/1.7.0",
-		"Prototype": "https://github.com/perennials/prototype-js/tarball/1.4.0",
-		"Net": "https://github.com/perennials/net-node/tarball/1.2.0"
-	},
-	"optionalDependencies": {
+		"Net": "https://github.com/perennials/net-node/tarball/1.2.0",
 		"snappy": "*"
 	},
 	"repository": {
