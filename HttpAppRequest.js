@@ -41,11 +41,18 @@ class HttpAppRequest {
 		throw new Error( 'HttpAppRequest.onHttpContent() not implemented.' );
 	}
 
+	onHttpError ( err ) {
+	}
+
 	onHttpHeaders () {
 		var _this = this;
 		var chunks = [];
 		this.Request.on( 'data', function( chunk ) {
 			chunks.push( chunk );
+		} );
+
+		this.Request.on( 'error', function ( err ) {
+			_this.onHttpError( err );
 		} );
 
 		this.Request.on( 'end', function () {

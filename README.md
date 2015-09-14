@@ -21,6 +21,7 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [Constructor](#constructor-1)
 		- [.onHttpHeaders()](#onhttpheaders)
 		- [.onHttpContent()](#onhttpcontent)
+		- [.onHttpError()](#onhttperror)
 		- [.onError()](#onerror)
 - [App](#app)
 	- [Methods](#methods-2)
@@ -194,6 +195,7 @@ var HttpAppRequest = require( 'App/HttpAppRequest' );
 - [Constructor](#constructor-1)
 - [.onHttpHeaders()](#onhttpheaders)
 - [.onHttpContent()](#onhttpcontent)
+- [.onHttpError()](#onhttperror)
 - [.onError()](#onerror)
 
 #### Constructor
@@ -231,6 +233,15 @@ Called whenever there is HTTP request and the whole request content is received.
 ```js
 .onHttpContent(
 	content:Buffer
+);
+```
+
+#### .onHttpError()
+Called whenever there is 'error' event on the HTTP request.
+
+```js
+.onHttpError(
+	err:Error
 );
 ```
 
