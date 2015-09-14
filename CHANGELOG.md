@@ -1,3 +1,7 @@
+1.5.4
+===
+- Fix: `HttpAppRequest.dispose()` was not called in some cases.
+
 1.5
 ===
 - Add support for `--arg value` notation in `Argv`.

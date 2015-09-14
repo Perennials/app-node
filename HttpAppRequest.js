@@ -18,10 +18,11 @@ class HttpAppRequest {
 		this.Domain.add( req );
 		this.Domain.add( res );
 
-		this._onResponseClose = this.dispose.bind( this );
+		this._onResponseEnd = this.dispose.bind( this );
 		this._onDomainError = this.onError.bind( this );
 
-		this.Response.once( 'close', this._onResponseClose );
+		this.Response.once( 'finish', this._onResponseEnd );
+		this.Response.once( 'close', this._onResponseEnd );
 		this.Domain.on( 'error', this._onDomainError );
 		
 		this.Domain.run( this.onHttpHeaders.bind( this ) );
