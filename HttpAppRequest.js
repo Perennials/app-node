@@ -25,7 +25,10 @@ class HttpAppRequest {
 		this._response.once( 'close', this._onResponseEnd );
 		this._domain.on( 'error', this._onDomainError );
 		
-		this._domain.run( this.onHttpHeaders.bind( this ) );
+		var _this = this;
+		// run this on the next tick so the registerRequest() call that leads here is done and no GC problems and other problems
+		process.nextTick( _ => _this._domain.run( _this.onHttpHeaders.bind( _this ) ) );
+		
 	}
 
 	getDomain () {

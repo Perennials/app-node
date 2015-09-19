@@ -1,3 +1,7 @@
+1.6.1
+===
+- Async fixes.
+
 1.6.0
 ===
 - All public properties in `HttpAppRequest` are now private and exposed via getters.
