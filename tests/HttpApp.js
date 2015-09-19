@@ -12,10 +12,10 @@ UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 		}
 
 		onHttpContent ( content ) {
-			test( this.Request.headers.someting === 'custom' );
+			test( this._request.headers.someting === 'custom' );
 			test( content.toString() === 'asd.qwe' );
-			this.Response.end();
-			this.App.close( function () {
+			this._response.end();
+			this._app.close( function () {
 				test.out();
 			} );
 		}
@@ -40,7 +40,7 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 		}
 
 		onHttpContent ( content ) {
-			this.Request.content = content;
+			this._request.content = content;
 			++nreq;
 			if ( nreq === 1 ) {
 				setTimeout( function () {
@@ -61,21 +61,21 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 
 		onError ( err ) {
 			++nerr;
-			this.Response.end();
+			this._response.end();
 			if ( nerr === 1 ) {
 				test( err.message === '3' );
-				test( this.Request.content.toString() === '333' );
-				this.App.close( function () {
+				test( this._request.content.toString() === '333' );
+				this._app.close( function () {
 					test.out();
 				} );
 			}
 			else if ( nerr === 2 ) {
 				test( err.message === '2' );
-				test( this.Request.content.toString() === '222' );
+				test( this._request.content.toString() === '222' );
 			}
 			else if ( nerr === 3 ) {
 				test( err.message === '1' );
-				test( this.Request.content.toString() === '111' );
+				test( this._request.content.toString() === '111' );
 			}
 		}
 	}

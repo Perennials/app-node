@@ -16,9 +16,12 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [.close()](#close)
 		- [.onHttpRequest()](#onhttprequest)
 - [HttpAppRequest](#httpapprequest)
-	- [Public properties](#public-properties)
 	- [Methods](#methods-1)
 		- [Constructor](#constructor-1)
+		- [.getApp()](#getapp)
+		- [.getDomain()](#getdomain)
+		- [.getRequest()](#getrequest)
+		- [.getResponse()](#getresponse)
 		- [.onHttpHeaders()](#onhttpheaders)
 		- [.onHttpContent()](#onhttpcontent)
 		- [.onHttpError()](#onhttperror)
@@ -64,24 +67,19 @@ var HttpApp = require( 'App/HttpApp' );
 ```js
 "use strict";
 
-var HttpApp = require( '../HttpApp' );
-var HttpAppRequest = require( '../HttpAppRequest' );
+var HttpApp = require( 'App/HttpApp' );
+var HttpAppRequest = require( 'App/HttpAppRequest' );
 
 // this will be instantiated by HttpApp whenever we have a new request coming in
 class MyAppRequest extends HttpAppRequest {
 	
-	constructor ( app, req, res ) {
-		// call the parent constructor
-		super( app, req, res );
-	}
-	
 	onError ( err ) {
 
-		console.log( 'Damn, error happened with this specific client request', this.Request );
+		console.log( 'Damn, error happened with this specific client request', Object.toString( this._request ) );
 
 		// finish the response so we can close the server
-		this.Response.writeHead( 500 );
-		this.Response.end();
+		this._response.writeHead( 500 );
+		this._response.end();
 
 		// call the default handler, which will abort the app
 		super.onError( err );
@@ -92,18 +90,18 @@ class MyAppRequest extends HttpAppRequest {
 	onHttpContent ( content ) {
 
 		// we have the full request at this point, headers and content
-		if ( this.Request.headers[ 'content-encoding' ] === 'identity' ) {
+		if ( this._request.headers[ 'content-encoding' ] === 'identity' ) {
 			console.log( 'The request content is', content.toString( 'utf8' ) );
 		}
 
-		doSomethingWithThe( this.Request, function ( good ) {
+		doSomethingWithThe( this._request, function ( good ) {
 
 			// normal nodejs handling of the response
-			this.Response.writeHead( good ? 200 : 500, {
+			this._response.writeHead( good ? 200 : 500, {
 				'Connection': 'close',
 				'Content-Type': 'text/plain'
 			} );
-			this.Response.end( 'bye' );
+			this._response.end( 'bye' );
 
 		} );
 
@@ -176,23 +174,13 @@ subclassed to override the desired functionality.
 var HttpAppRequest = require( 'App/HttpAppRequest' );
 ```
 
-- [Public properties](#public-properties)
-- [Methods](#methods-1)
-
-### Public properties
-
-```js
-{
-	App: HttpApp,
-	Request: http.IncommingMessage,
-	Response: http.ServerResponse,
-	Domain: Domain
-}
-```
-
 ### Methods
 
 - [Constructor](#constructor-1)
+- [.getApp()](#getapp)
+- [.getDomain()](#getdomain)
+- [.getRequest()](#getrequest)
+- [.getResponse()](#getresponse)
 - [.onHttpHeaders()](#onhttpheaders)
 - [.onHttpContent()](#onhttpcontent)
 - [.onHttpError()](#onhttperror)
@@ -213,6 +201,33 @@ new HttpAppRequest(
 );
 ```
 
+#### .getApp()
+Retrieves the HttpApp associated with this request.
+
+```js
+.getApp() : HttpApp;
+```
+
+#### .getDomain()
+Retrieves the node Domain associated with this request.
+
+```js
+.getDomain() : Domain;
+```
+
+#### .getRequest()
+Retrieves the node request associated with this request.
+
+```js
+.getRequest() : IncommingMessage;
+```
+
+#### .getResponse()
+Retrieves the node response associated with this request.
+
+```js
+.getResponse() : ServerResponse;
+```
 
 #### .onHttpHeaders()
 Called whenever there is HTTP request. The default implementation installs

@@ -1,3 +1,7 @@
+1.6.0
+===
+- All public properties in `HttpAppRequest` are now private and exposed via getters.
+
 1.5.4
 ===
 - Fix: `HttpAppRequest.dispose()` was not called in some cases.

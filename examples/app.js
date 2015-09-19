@@ -6,18 +6,13 @@ var HttpAppRequest = require( '../HttpAppRequest' );
 // this will be instantiated by HttpApp whenever we have a new request coming in
 class MyAppRequest extends HttpAppRequest {
 	
-	constructor ( app, req, res ) {
-		// call the parent constructor
-		super( app, req, res );
-	}
-	
 	onError ( err ) {
 
-		console.log( 'Damn, error happened with this specific client request', this.Request );
+		console.log( 'Damn, error happened with this specific client request', Object.toString( this._request ) );
 
 		// finish the response so we can close the server
-		this.Response.writeHead( 500 );
-		this.Response.end();
+		this._response.writeHead( 500 );
+		this._response.end();
 
 		// call the default handler, which will abort the app
 		super.onError( err );
@@ -28,18 +23,18 @@ class MyAppRequest extends HttpAppRequest {
 	onHttpContent ( content ) {
 
 		// we have the full request at this point, headers and content
-		if ( this.Request.headers[ 'content-encoding' ] === 'identity' ) {
+		if ( this._request.headers[ 'content-encoding' ] === 'identity' ) {
 			console.log( 'The request content is', content.toString( 'utf8' ) );
 		}
 
-		doSomethingWithThe( this.Request, function ( good ) {
+		doSomethingWithThe( this._request, function ( good ) {
 
 			// normal nodejs handling of the response
-			this.Response.writeHead( good ? 200 : 500, {
+			this._response.writeHead( good ? 200 : 500, {
 				'Connection': 'close',
 				'Content-Type': 'text/plain'
 			} );
-			this.Response.end( 'bye' );
+			this._response.end( 'bye' );
 
 		} );
 
