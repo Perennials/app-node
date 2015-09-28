@@ -116,3 +116,36 @@ Unitest( 'Config.relative', function ( test ) {
 	test( cfg.get( 'aa**' )['aabb.ccdd'] == '{1} --' );
 	test( cfg.get( 'aa**', 2 )['aabb.ccdd'] == '2 --' );
 } );
+
+Unitest( 'Config.set', function ( test ) {
+
+	var cfg = new Config( {} );
+	cfg.set( 'A', 1 );
+	test.eq( cfg.get( 'A' ), 1 );
+
+	var cfg = new Config( { A: 1, B: 2 } );
+	cfg.set( 'B', 3 );
+	test.eq( cfg.get( 'B' ), 3 );
+
+	var cfg = new Config( { A: 1, B: { C: 3 } } );
+	cfg.set( 'B.C', 4 );
+	test.eq( cfg.get( 'B.C' ), 4 );
+
+	var cfg = new Config( { A: 1, B: 2 } );
+	cfg.set( 'B.C', 3 );
+	test.eq( cfg.get( 'B.C' ), 3 );
+
+	var cfg2 = new Config( { A: 1, B: {} } );
+	var cfg = new Config( { A: 1 }, cfg2 );
+	cfg.set( 'B.C', 3 );
+	test.eq( cfg.get( 'B.C' ), 3 );
+	test.eq( cfg2.get( 'B.C' ), 3 );
+
+	var cfg2 = new Config( { A: 1 } );
+	var cfg = new Config( { A: 1 }, cfg2 );
+	cfg.set( 'B.C', 3 );
+	test.eq( cfg.get( 'B.C' ), 3 );
+	test.eq( cfg2.get( 'B.C' ), undefined );
+
+
+} );

@@ -1,3 +1,8 @@
+1.7
+===
+- Added `Config.set()`.
+
+
 1.6.1
 ===
 - Async fixes.
