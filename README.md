@@ -136,8 +136,8 @@ Starts listening for HTTP requests.
 
 ```js
 .startListening(
-	host:String,
-	port:Number
+	port:Number,
+	host:String
 );
 ```
 
