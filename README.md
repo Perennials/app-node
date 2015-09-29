@@ -109,8 +109,8 @@ class MyAppRequest extends HttpAppRequest {
 }
 
 // construct a new HttpApp, tell it our request class is MyAppRequest
-var app = new HttpApp( MyAppRequest, '0.0.0.0', 1337 );
-app.startListening();
+var app = new HttpApp( MyAppRequest );
+app.startListening( '0.0.0.0', 1337 );
 ```
 
 ### Methods
@@ -128,8 +128,6 @@ a new instance of this class for each incomming request.
 ```js
 new HttpApp(
 	appRequestClass:Function
-	host:String,
-	port:Number
 );
 ```
 
@@ -137,7 +135,10 @@ new HttpApp(
 Starts listening for HTTP requests.
 
 ```js
-.startListening();
+.startListening(
+	host:String,
+	port:Number
+);
 ```
 
 

@@ -1,3 +1,7 @@
+1.8
+===
+- Moved the host/port parameters from `HttpApp.constructor()` to `HttpApp.startListening()`.
+
 1.7
 ===
 - Added `Config.set()`.

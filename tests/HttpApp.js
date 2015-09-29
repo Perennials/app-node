@@ -7,10 +7,6 @@ var HttpRequest = require( 'Net/HttpRequest' );
 UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 
 	class TestAppRequest extends HttpAppRequest {
-		constructor ( app, req, res ) {
-			super( app, req, res );
-		}
-
 		onHttpContent ( content ) {
 			test( this._request.headers.someting === 'custom' );
 			test( content.toString() === 'asd.qwe' );
@@ -21,8 +17,8 @@ UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 		}
 	}
 
-	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
-	app1.startListening();
+	var app1 = new HttpApp( TestAppRequest );
+	app1.startListening( 55555, '127.0.0.1' );
 	(new HttpRequest( 'http://127.0.0.1:55555' ))
 		.setHeader( 'someting', 'custom' )
 		.send( 'asd.qwe' );
@@ -35,10 +31,6 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 	var nerr = 0;
 
 	class TestAppRequest extends HttpAppRequest {
-		constructor ( app, req, res ) {
-			super( app, req, res );
-		}
-
 		onHttpContent ( content ) {
 			this._request.content = content;
 			++nreq;
@@ -80,8 +72,8 @@ UnitestA( 'Parallel domain handling', function ( test ) {
 		}
 	}
 
-	var app1 = new HttpApp( TestAppRequest, '127.0.0.1', 55555 );
-	app1.startListening();
+	var app1 = new HttpApp( TestAppRequest );
+	app1.startListening( 55555, '127.0.0.1' );
 	(new HttpRequest( 'http://127.0.0.1:55555' )).send( '111' );
 	(new HttpRequest( 'http://127.0.0.1:55555' )).send( '222' );
 	(new HttpRequest( 'http://127.0.0.1:55555' )).send( '333' );

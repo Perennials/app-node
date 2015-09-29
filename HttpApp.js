@@ -6,13 +6,11 @@ var Http = require( 'http' );
 
 class HttpApp extends App {
 
-	constructor ( appRequestClass, host, port ) {
+	constructor ( appRequestClass ) {
 
 		super();
 		
 		this._appRequestClass = appRequestClass;
-		this._host = host;
-		this._port = port;
 		this._server = Http.createServer();
 		this._server.on( 'request', this.onHttpRequest.bind( this ) );
 		this._requests = [];
@@ -36,8 +34,8 @@ class HttpApp extends App {
 		return false;
 	}
 
-	startListening () {
-		this._server.listen( this._port, this._host );
+	startListening ( port, host ) {
+		this._server.listen( port, host );
 	}
 
 	close ( callback ) {

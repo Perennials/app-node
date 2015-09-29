@@ -42,8 +42,8 @@ class MyAppRequest extends HttpAppRequest {
 }
 
 // construct a new HttpApp, tell it our request class is MyAppRequest
-var app = new HttpApp( MyAppRequest, '0.0.0.0', 1337 );
-app.startListening();
+var app = new HttpApp( MyAppRequest );
+app.startListening( 1337, '0.0.0.0' );
 
 
 setTimeout( function () {
