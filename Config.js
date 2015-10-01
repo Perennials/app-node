@@ -281,8 +281,8 @@ class Config {
 					return _this._renderRel( value, null, ctx )
 				}
 
-				// don't change
-				return match;
+				// nothing is found use empty string, looks more expected than not replacing it
+				return '';
 			} );
 		}
 		

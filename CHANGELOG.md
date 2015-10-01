@@ -1,3 +1,7 @@
+1.9
+===
+- Changed the behaviour of `Config.render()` to replace not-found value refs with empty string.
+
 1.8
 ===
 - Moved the host/port parameters from `HttpApp.constructor()` to `HttpApp.startListening()`.

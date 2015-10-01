@@ -37,7 +37,7 @@ Unitest( 'Config.sample 2', function ( test ) {
 	test( cfg.get( 'a' ) == 'ba' );
 	test( cfg.get( 'b.b', '1' ) == 'bb 1' );
 	test( cfg.get( 'b.parent_a' ) == 'ba' );
-	test( cfg.get( 'b.parent_c', '2' ) == 'ca {1}' );
+	test( cfg.get( 'b.parent_c', '2' ) == 'ca ' );
 	test( cfg.get( 'b.this_a' ) == 'ba' );
 } );
 
@@ -96,24 +96,24 @@ Unitest( 'Config.*', function ( test ) {
 	test( m['a.b.d'].Matches[1] == 'b.d' );
 
 	var cfg = new Config( { 'bb00': '11', 'aa00': '00', 'aabb': { 'ccdd': '{1} {aabb.eeff}', 'eeff': function () { return '--'; } } } );
-	test( cfg.get( 'aabb.ccdd' ) == '{1} --' );
+	test( cfg.get( 'aabb.ccdd' ) == ' --' );
 	test( cfg.get( 'aabb.ccdd', 1 ) == '1 --' );
 	test( cfg.get( 'aa*0' )['aa00'] == '00' );
 	test( Object.keys( cfg.get( 'aa*0' ) ).length == 1 );
 	test( Object.keys( cfg.get( 'aa**' ) ).length == 3 );
-	test( cfg.get( 'aa**' )['aabb.ccdd'] == '{1} --' );
+	test( cfg.get( 'aa**' )['aabb.ccdd'] == ' --' );
 	test( cfg.get( 'aa**', 2 )['aabb.ccdd'] == '2 --' );
 
 } );
 
 Unitest( 'Config.relative', function ( test ) {
 	var cfg = new Config( { 'bb00': '11', 'aa00': '00', 'aabb': { 'ccdd': '{1} {_.eeff}', 'eeff': function () { return '--'; } } } );
-	test( cfg.get( 'aabb.ccdd' ) == '{1} --' );
+	test( cfg.get( 'aabb.ccdd' ) == ' --' );
 	test( cfg.get( 'aabb.ccdd', 1 ) == '1 --' );
 	test( cfg.get( 'aa*0' )['aa00'] == '00' );
 	test( Object.keys( cfg.get( 'aa*0' ) ).length == 1 );
 	test( Object.keys( cfg.get( 'aa**' ) ).length == 3 );
-	test( cfg.get( 'aa**' )['aabb.ccdd'] == '{1} --' );
+	test( cfg.get( 'aa**' )['aabb.ccdd'] == ' --' );
 	test( cfg.get( 'aa**', 2 )['aabb.ccdd'] == '2 --' );
 } );
 
