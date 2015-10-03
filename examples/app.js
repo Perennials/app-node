@@ -2,6 +2,7 @@
 
 var HttpApp = require( '../HttpApp' );
 var HttpAppRequest = require( '../HttpAppRequest' );
+var RequestRouter = require( '../RequestRouter' );
 
 // this will be instantiated by HttpApp whenever we have a new request coming in
 class MyAppRequest extends HttpAppRequest {
@@ -41,8 +42,23 @@ class MyAppRequest extends HttpAppRequest {
 	}
 }
 
-// construct a new HttpApp, tell it our request class is MyAppRequest
-var app = new HttpApp( MyAppRequest );
+// construct a new HttpApp, here we give it a RequestRouter to show its usage,
+// but we could replace this with MyAppRequest if have only one request handler
+var app = new HttpApp( new class extends RequestRouter {
+
+	// just demonstrate how to use the router, it does nothing in this example
+	route ( app, req, res ) {
+		// if we receive a request with header like this we choose one handler
+		if ( req.headers[ 'my-proc' ] == 'NonExistentProc' ) {
+			return NonExistentProc;
+		}
+		// otherwise we choose other handler
+		else {
+			return MyAppRequest;
+		}
+	}
+
+} );
 app.startListening( 1337, '0.0.0.0' );
 
 

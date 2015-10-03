@@ -3,6 +3,34 @@
 var HttpApp = require( '../HttpApp' );
 var HttpAppRequest = require( '../HttpAppRequest' );
 var HttpRequest = require( 'Net/HttpRequest' );
+var RequestRouter = require( '../RequestRouter' );
+
+UnitestA( 'RequestRouter', function ( test ) {
+
+	class TestAppRequest extends HttpAppRequest {
+		onHttpContent ( content ) {
+			test( this._request.headers.someting === 'custom' );
+			test( content.toString() === 'asd.qwe' );
+			this._response.end();
+			this._app.close( function () {
+				test.out();
+			} );
+		}
+	}
+
+	var app1 = new HttpApp( new class extends RequestRouter {
+		route ( app, req, res ) {
+			if ( req.headers[ 'someting' ] === 'custom' ) {
+				return TestAppRequest;
+			}
+		}
+	} );
+	app1.startListening( 55555, '127.0.0.1' );
+	(new HttpRequest( 'http://127.0.0.1:55555' ))
+		.setHeader( 'someting', 'custom' )
+		.send( 'asd.qwe' );
+
+} );
 
 UnitestA( 'HttpAppRequest.onHttpContent', function ( test ) {
 

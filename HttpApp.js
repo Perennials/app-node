@@ -2,6 +2,7 @@
 
 var App = require( './App' );
 var HttpAppRequest = require( './HttpAppRequest' );
+var RequestRouter = require( './RequestRouter' );
 var Http = require( 'http' );
 
 class HttpApp extends App {
@@ -47,7 +48,17 @@ class HttpApp extends App {
 	}
 
 	onHttpRequest ( req, res ) {
-		this.registerRequest( new this._appRequestClass( this, req, res ) );
+		var appRequestClass = this._appRequestClass;
+		if ( appRequestClass instanceof RequestRouter ) {
+			appRequestClass = appRequestClass.route( this, req, res );
+		}
+		if ( appRequestClass instanceof Function ) {
+			this.registerRequest( new appRequestClass( this, req, res ) );
+		}
+		else {
+			// if there is no handler close immediately
+			res.end();
+		}
 	}
 
 }

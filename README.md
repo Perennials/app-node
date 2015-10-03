@@ -15,8 +15,11 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [.startListening()](#startlistening)
 		- [.close()](#close)
 		- [.onHttpRequest()](#onhttprequest)
-- [HttpAppRequest](#httpapprequest)
+- [RequestRouter](#requestrouter)
 	- [Methods](#methods-1)
+		- [.route()](#route)
+- [HttpAppRequest](#httpapprequest)
+	- [Methods](#methods-2)
 		- [Constructor](#constructor-1)
 		- [.getApp()](#getapp)
 		- [.getDomain()](#getdomain)
@@ -27,7 +30,7 @@ npm install https://github.com/Perennials/app-node/tarball/master
 		- [.onHttpError()](#onhttperror)
 		- [.onError()](#onerror)
 - [App](#app)
-	- [Methods](#methods-2)
+	- [Methods](#methods-3)
 		- [.getArgv()](#getargv)
 		- [.onClose()](#onclose)
 		- [.close()](#close-1)
@@ -69,6 +72,7 @@ var HttpApp = require( 'App/HttpApp' );
 
 var HttpApp = require( 'App/HttpApp' );
 var HttpAppRequest = require( 'App/HttpAppRequest' );
+var RequestRouter = require( 'App/RequestRouter' );
 
 // this will be instantiated by HttpApp whenever we have a new request coming in
 class MyAppRequest extends HttpAppRequest {
@@ -108,9 +112,24 @@ class MyAppRequest extends HttpAppRequest {
 	}
 }
 
-// construct a new HttpApp, tell it our request class is MyAppRequest
-var app = new HttpApp( MyAppRequest );
-app.startListening( '0.0.0.0', 1337 );
+// construct a new HttpApp, here we give it a RequestRouter to show its usage,
+// but we could replace this with MyAppRequest if have only one request handler
+var app = new HttpApp( new class extends RequestRouter {
+
+	// just demonstrate how to use the router, it does nothing in this example
+	route ( app, req, res ) {
+		// if we receive a request with header like this we choose one handler
+		if ( req.headers[ 'my-proc' ] == 'NonExistentProc' ) {
+			return NonExistentProc;
+		}
+		// otherwise we choose other handler
+		else {
+			return MyAppRequest;
+		}
+	}
+
+} );
+app.startListening( 1337, '0.0.0.0' );
 ```
 
 ### Methods
@@ -123,11 +142,13 @@ app.startListening( '0.0.0.0', 1337 );
 #### Constructor
 Constructor. The `appRequestClass` argument is a constructor of a class
 derived from `HttpAppRequest`. It will be used by `onHttpRequest()` to create
-a new instance of this class for each incomming request.
+a new instance of this class for each incomming request. Alternatively an instance
+of `RequestRouter` can be passed. Its [.route()](#route) method will be used
+to determine the appropriate `HttpAppRequest` class.
 
 ```js
 new HttpApp(
-	appRequestClass:Function
+	appRequestClass:Function|RequestRouter
 );
 ```
 
@@ -163,6 +184,33 @@ Can be overriden for advanced use.
 ```
 
 
+RequestRouter
+-------------
+May be used with `HttpApp` on incomming requests to decide the appropriate
+class that will handle the request.
+
+```js
+var RequestRouter = require( 'App/RequestRouter' );
+```
+
+### Methods
+
+#### .route()
+This method must be overloaded to decide the class that will handle the
+request. It returns a reference to the class itself, or in ES5 terms a
+reference to the function that will construct an instance of this class.
+
+It receives reference to the `HttpApp` and nodejs' request and
+response objects from the request handler of the HTTP server.
+
+```js
+.route(
+	app:HttpApp,
+	req:http.IncommingMessage,
+	res:http.ServerResponse
+) : Function;
+```
+
 
 HttpAppRequest
 --------------
@@ -196,9 +244,9 @@ by the constructor of the derived classes.
 
 ```js
 new HttpAppRequest(
-	app: HttpApp,
-	req: http.IncommingMessage,
-	res: http.ServerResponse,
+	app:HttpApp,
+	req:http.IncommingMessage,
+	res:http.ServerResponse
 );
 ```
 

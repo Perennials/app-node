@@ -1,3 +1,7 @@
+1.10
+===
+- Added `RequestRouter` to support different request handlers with `HttpApp`.
+
 1.9
 ===
 - Changed the behaviour of `Config.render()` to replace not-found value refs with empty string.
@@ -9,7 +13,6 @@
 1.7
 ===
 - Added `Config.set()`.
-
 
 1.6.1
 ===
