@@ -5,6 +5,21 @@ var HttpAppRequest = require( '../HttpAppRequest' );
 var HttpRequest = require( 'Net/HttpRequest' );
 var RequestRouter = require( '../RequestRouter' );
 
+UnitestA( 'Empty handler', function ( test ) {
+
+	var app1 = new HttpApp( null );
+	app1.startListening( 55555, '127.0.0.1' );
+	(new HttpRequest( 'http://127.0.0.1:55555' ))
+		.setHeader( 'someting', 'custom' )
+		.send( 'asd.qwe', function ( res ) {
+			test( res.isError() );
+			app1.close( function () {
+				test.out();
+			} )
+		} );
+
+} );
+
 UnitestA( 'RequestRouter', function ( test ) {
 
 	class TestAppRequest extends HttpAppRequest {

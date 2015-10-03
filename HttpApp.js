@@ -57,6 +57,7 @@ class HttpApp extends App {
 		}
 		else {
 			// if there is no handler close immediately
+			res.writeHead( 500, { Connection: 'close' } );
 			res.end();
 		}
 	}
