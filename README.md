@@ -117,7 +117,7 @@ class MyAppRequest extends HttpAppRequest {
 var app = new HttpApp( new class extends RequestRouter {
 
 	// just demonstrate how to use the router, it does nothing in this example
-	route ( app, req, res ) {
+	route ( app, req ) {
 		// if we receive a request with header like this we choose one handler
 		if ( req.headers[ 'my-proc' ] == 'NonExistentProc' ) {
 			return NonExistentProc;
@@ -200,14 +200,13 @@ This method must be overloaded to decide the class that will handle the
 request. It returns a reference to the class itself, or in ES5 terms a
 reference to the function that will construct an instance of this class.
 
-It receives reference to the `HttpApp` and nodejs' request and
-response objects from the request handler of the HTTP server.
+It receives reference to the `HttpApp` and nodejs' request object from the
+request handler of the HTTP server.
 
 ```js
 .route(
 	app:HttpApp,
-	req:http.IncommingMessage,
-	res:http.ServerResponse
+	req:http.IncommingMessage
 ) : Function;
 ```
 

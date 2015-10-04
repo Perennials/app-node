@@ -47,7 +47,7 @@ class MyAppRequest extends HttpAppRequest {
 var app = new HttpApp( new class extends RequestRouter {
 
 	// just demonstrate how to use the router, it does nothing in this example
-	route ( app, req, res ) {
+	route ( app, req ) {
 		// if we receive a request with header like this we choose one handler
 		if ( req.headers[ 'my-proc' ] == 'NonExistentProc' ) {
 			return NonExistentProc;
