@@ -55,7 +55,10 @@ class HttpApp extends App {
 		if ( appRequestClass instanceof Function ) {
 			this.registerRequest( new appRequestClass( this, req, res ) );
 		}
-		else {
+		else if ( appRequestClass instanceof HttpAppRequest ) {
+			this.registerRequest( appRequestClass );
+		}
+		else if ( appRequestClass !== true ) {
 			// if there is no handler close immediately
 			res.writeHead( 500, { Connection: 'close' } );
 			res.end();

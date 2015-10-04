@@ -1,7 +1,7 @@
 "use strict";
 
 class RequestRouter {
-	route ( app, req, res ) {
+	route ( app, req, content ) {
 		return null;
 	}
 }
