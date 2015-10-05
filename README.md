@@ -214,7 +214,10 @@ request handler of the HTTP server.
 HttpAppRequest
 --------------
 
-This object encapsulates node's native types passed to the HTTP request
+This class is instantiated by the `HttpApp` class when there is incoming
+server request.
+
+The object encapsulates node's native types passed to the HTTP request
 callback, as well as the domain associated with the request. It should be
 subclassed to override the desired functionality.
 
