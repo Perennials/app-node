@@ -101,14 +101,6 @@ class HttpAppRequest {
 			}
 		} );
 
-		// new ConcatReader( this._request, ( err, content ) => {
-		// 	if ( err ) {
-		// 		_this.onHttpError( err );
-		// 		return;
-		// 	}
-
-		// 	_this.onHttpContent( content );
-		// } );
 	}
 
 	onError ( err ) {
