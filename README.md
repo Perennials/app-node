@@ -452,9 +452,9 @@ var Argv = require( 'App/Argv' );
 ```js
 var Argv = require( 'App/Argv' );
 
-var argv = Argv.parse( [ '-arg1=value', '-flag', 'arg2', '-arg3=1', '-arg3=2', '-arg3' ] );
+var argv = Argv.parse( [ '-arg1=value', '-flag', 'arg2', '-arg3=1', '-arg3=2', '-arg3', '--arg4', 'value' ] );
 // this will become
-{ arg1: 'value', flag: true, "2": 'arg2', arg3: [ '1', '2', true ] };
+{ arg1: 'value', flag: true, "2": 'arg2', arg3: [ '1', '2', true ], arg4: 'value' };
 ```
 
 
