@@ -5,6 +5,18 @@
 var clr = {
 	reset: '\x1B[0m',
 	
+	bold: '\x1B[1m',
+	notbold: '\x1B[21m',
+
+	italic: '\x1B[3m',
+	notitalic: '\x1B[23m',
+
+	underline: '\x1B[4m',
+	notunderline: '\x1B[24m',
+	
+	blinking: '\x1B[5m',
+	notblinking: '\x1B[25m',
+	
 	def: '\x1B[39m',
 	defbg: '\x1B[49m',
 	
